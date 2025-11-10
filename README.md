@@ -1,9 +1,9 @@
-# Advent of Code 2024
+# Advent of Code 2025
 
-My personal solutions of the [Advent of Code 2024](https://adventofcode.com/2024) challenge
+My personal solutions of the [Advent of Code 2025](https://adventofcode.com/2025) challenge
 
 [![Language](https://img.shields.io/badge/Language-Rust-orange)](https://www.rust-lang.org/)
-[![Days completed](https://img.shields.io/badge/Days%20completed-25-red)](https://github.com/TrojanerHD/AdventofCode2024)
+[![Days completed](https://img.shields.io/badge/Days%20completed-0-red)](https://github.com/TrojanerHD/AdventofCode2025)
 
 ## Check out solutions from others
 
@@ -11,9 +11,9 @@ My personal solutions of the [Advent of Code 2024](https://adventofcode.com/2024
   <thead>
     <tr>
       <th>Name</th>
-      <th>2022</th>
       <th>2023</th>
       <th>2024</th>
+      <th>2025</th>
     </tr>
   </thead>
   <tbody>
