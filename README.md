@@ -6,6 +6,7 @@ My personal solutions of the [Advent of Code 2025](https://adventofcode.com/2025
 [![Days completed](https://img.shields.io/badge/Days%20completed-0-red)](https://github.com/TrojanerHD/AdventofCode2025)
 
 ## Check out solutions from others
+**This table will scroll through the years as you click through my repositories**; *if you click on year X, the repositories of X-1, X, and X + 1 (if available) will be shown*.
 
 <table>
   <thead>
@@ -29,12 +30,6 @@ My personal solutions of the [Advent of Code 2025](https://adventofcode.com/2025
       <td></td>
     </tr>
     <tr>
-      <td>networkException</td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
       <td>derNiklaas</td>
       <td><a href="https://github.com/derNiklaas/Advent-of-Code-2023">Advent-of-Code-2023</a></td>
       <td><a href="https://github.com/derNiklaas/Advent-Of-Code-2024">Advent-Of-Code-2024</a></td>
@@ -47,38 +42,8 @@ My personal solutions of the [Advent of Code 2025](https://adventofcode.com/2025
       <td></td>
     </tr>
     <tr>
-      <td>andi-makes</td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>feldim2425</td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
       <td>daanbreur</td>
       <td><a href="https://github.com/daanbreur/AdventofCode">AdventofCode</a></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>1Turtle</td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>J0B10</td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>Gewi413</td>
-      <td></td>
       <td></td>
       <td></td>
     </tr>
