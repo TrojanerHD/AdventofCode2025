@@ -1,43 +1,49 @@
-struct Point {
-    x: usize,
-    y: usize,
-}
-
-fn check_surrounding(points: &[Point], point: &Point) -> usize {
-    let y_minus = point.y.checked_sub(1).unwrap_or(point.y);
-    let x_minus = point.x.checked_sub(1).unwrap_or(point.x);
-
+fn check_surrounding(points: &[Vec<bool>], x: usize, y: usize) -> usize {
+    let y_minus = y.checked_sub(1).unwrap_or(y);
+    let x_minus = x.checked_sub(1).unwrap_or(x);
     points
         .iter()
-        .filter(|point2| {
-            point2.x >= x_minus
-                && point2.x <= point.x + 1
-                && point2.y >= y_minus
-                && point2.y <= point.y + 1
-                && (point2.x != point.x || point2.y != point.y)
+        .enumerate()
+        .take((y + 1).min(points.len() - 1) + 1)
+        .skip(y_minus)
+        .scan(0_usize, |acc, (y1, line)| -> Option<usize> {
+            if *acc >= 4 {
+                None
+            } else {
+                *acc += line
+                    .iter()
+                    .enumerate()
+                    .take((x + 1).min(line.len() - 1) + 1)
+                    .skip(x_minus)
+                    .scan(0_usize, |acc2, (x1, &val)| {
+                        if *acc2 >= 4 - *acc {
+                            return None;
+                        }
+                        if (y1 != y || x1 != x) && val {
+                            *acc2 += 1;
+                        }
+                        Some(*acc2)
+                    })
+                    .last()
+                    .unwrap();
+                Some(*acc)
+            }
         })
-        .take(4)
-        .count()
+        .last()
+        .unwrap()
 }
 
 pub fn part1(input: &str) -> String {
     let points = input
         .lines()
-        .enumerate()
-        .flat_map(|(y, line)| {
-            line.chars().enumerate().filter_map(move |(x, char)| {
-                if char == '@' {
-                    Some(Point { x, y })
-                } else {
-                    None
-                }
-            })
-        })
+        .map(|line| line.chars().map(|char| char == '@').collect::<Vec<_>>())
         .collect::<Vec<_>>();
     let mut res = 0;
-    for point in points.iter() {
-        if check_surrounding(&points, point) < 4 {
-            res += 1;
+    for (y, line) in points.iter().enumerate() {
+        for (x, &val) in line.iter().enumerate() {
+            if val && check_surrounding(&points, x, y) < 4 {
+                res += 1;
+            }
         }
     }
     res.to_string().to_owned()
@@ -46,39 +52,27 @@ pub fn part1(input: &str) -> String {
 pub fn part2(input: &str) -> String {
     let mut points = input
         .lines()
-        .enumerate()
-        .flat_map(|(y, line)| {
-            line.chars().enumerate().filter_map(move |(x, char)| {
-                if char == '@' {
-                    Some(Point { x, y })
-                } else {
-                    None
-                }
-            })
-        })
+        .map(|line| line.chars().map(|char| char == '@').collect::<Vec<_>>())
         .collect::<Vec<_>>();
-    let num_points = points.len();
 
+    let mut res = 0;
     loop {
-        let mut points_to_remove = points
-            .iter()
-            .enumerate()
-            .filter_map(|(i, point)| {
-                if check_surrounding(&points, point) < 4 {
-                    Some(i)
-                } else {
-                    None
+        let mut new_points = points.clone();
+        let mut change = false;
+        for (y, line) in points.iter().enumerate() {
+            for (x, &val) in line.iter().enumerate() {
+                if val && check_surrounding(&points, x, y) < 4 {
+                    new_points[y][x] = false;
+                    change = true;
+                    res += 1;
                 }
-            })
-            .collect::<Vec<_>>();
-        if points_to_remove.is_empty() {
+            }
+        }
+        if !change {
             break;
         }
-        points_to_remove.reverse();
-        for i in points_to_remove {
-            points.remove(i);
-        }
+        points = new_points;
     }
 
-    (num_points - points.len()).to_string().to_owned()
+    res.to_string().to_owned()
 }
