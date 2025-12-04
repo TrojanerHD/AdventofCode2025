@@ -1,8 +1,25 @@
-#[derive(Debug, Clone, PartialEq)]
 struct Point {
     x: usize,
     y: usize,
 }
+
+fn check_surrounding(points: &[Point], point: &Point) -> usize {
+    let y_minus = point.y.checked_sub(1).unwrap_or(point.y);
+    let x_minus = point.x.checked_sub(1).unwrap_or(point.x);
+
+    points
+        .iter()
+        .filter(|point2| {
+            point2.x >= x_minus
+                && point2.x <= point.x + 1
+                && point2.y >= y_minus
+                && point2.y <= point.y + 1
+                && (point2.x != point.x || point2.y != point.y)
+        })
+        .take(4)
+        .count()
+}
+
 pub fn part1(input: &str) -> String {
     let points = input
         .lines()
@@ -19,21 +36,7 @@ pub fn part1(input: &str) -> String {
         .collect::<Vec<_>>();
     let mut res = 0;
     for point in points.iter() {
-        let mut count = 0;
-        let y_minus = point.y.checked_sub(1).unwrap_or(point.y);
-        for y in y_minus..=point.y + 1 {
-            let x_minus = point.x.checked_sub(1).unwrap_or(point.x);
-            for x in x_minus..=point.x + 1 {
-                if x == point.x && y == point.y {
-                    continue;
-                }
-
-                if points.iter().any(|point2| point2.x == x && point2.y == y) {
-                    count += 1;
-                }
-            }
-        }
-        if count < 4 {
+        if check_surrounding(&points, point) < 4 {
             res += 1;
         }
     }
@@ -54,32 +57,28 @@ pub fn part2(input: &str) -> String {
             })
         })
         .collect::<Vec<_>>();
-    let mut res = 0;
-    let mut new_points = points.clone();
-    let mut first_loop = true;
-    while first_loop || new_points != points {
-        first_loop = false;
-        points = new_points.clone();
-        for point in points.iter() {
-            let mut count = 0;
-            let y_minus = point.y.checked_sub(1).unwrap_or(point.y);
-            for y in y_minus..=point.y + 1 {
-                let x_minus = point.x.checked_sub(1).unwrap_or(point.x);
-                for x in x_minus..=point.x + 1 {
-                    if x == point.x && y == point.y {
-                        continue;
-                    }
+    let num_points = points.len();
 
-                    if points.iter().any(|point2| point2.x == x && point2.y == y) {
-                        count += 1;
-                    }
+    loop {
+        let mut points_to_remove = points
+            .iter()
+            .enumerate()
+            .filter_map(|(i, point)| {
+                if check_surrounding(&points, point) < 4 {
+                    Some(i)
+                } else {
+                    None
                 }
-            }
-            if count < 4 {
-                res += 1;
-                new_points.retain(|point2| point2.x != point.x || point2.y != point.y);
-            }
+            })
+            .collect::<Vec<_>>();
+        if points_to_remove.is_empty() {
+            break;
+        }
+        points_to_remove.reverse();
+        for i in points_to_remove {
+            points.remove(i);
         }
     }
-    res.to_string().to_owned()
+
+    (num_points - points.len()).to_string().to_owned()
 }
