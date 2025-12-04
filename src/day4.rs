@@ -59,9 +59,9 @@ pub fn part2(input: &str) -> String {
     loop {
         let mut new_points = points.clone();
         let mut change = false;
-        for (y, line) in points.iter().enumerate() {
-            for (x, &val) in line.iter().enumerate() {
-                if val && check_surrounding(&points, x, y) < 4 {
+        for (y, line) in points.into_iter().enumerate() {
+            for (x, val) in line.into_iter().enumerate() {
+                if val && check_surrounding(&new_points, x, y) < 4 {
                     new_points[y][x] = false;
                     change = true;
                     res += 1;
