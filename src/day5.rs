@@ -1,8 +1,9 @@
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 struct Range {
-    start: usize,
-    end: usize,
+    start: u64,
+    end: u64,
 }
+
 pub fn part1(input: &str) -> String {
     let mut first_parsing = true;
     let mut ranges = Vec::new();
@@ -19,28 +20,25 @@ pub fn part1(input: &str) -> String {
                 end: end.parse().unwrap(),
             });
         } else {
-            query.push(line.parse::<usize>().unwrap());
+            query.push(line.parse().unwrap());
         }
     }
 
-    let mut res = 0;
-    for val in query {
-        if ranges
-            .iter()
-            .any(|range| range.start <= val && range.end >= val)
-        {
-            res += 1;
-        }
-    }
-    res.to_string().to_owned()
+    query
+        .into_iter()
+        .filter(|&val| {
+            ranges
+                .iter()
+                .any(|range| range.start <= val && range.end >= val)
+        })
+        .count()
+        .to_string()
+        .to_owned()
 }
 
 pub fn part2(input: &str) -> String {
     let mut ranges = Vec::new();
-    for line in input.lines() {
-        if line.is_empty() {
-            break;
-        }
+    for line in input.lines().take_while(|line| !line.is_empty()) {
         let (start, end) = line.split_once("-").unwrap();
         ranges.push(Range {
             start: start.parse().unwrap(),
@@ -48,26 +46,8 @@ pub fn part2(input: &str) -> String {
         });
     }
 
-    //
-    // let val = ranges
-    //     .iter()
-    //     .flat_map(|range| (range.start..=range.end).collect::<Vec<usize>>())
-    //     .collect::<Vec<_>>();
-    // println!("{:?}", val);
-    // val.iter().dedup().count().to_string().to_owned()
-    //
-    // let mut all_vals = HashSet::new();
-    // for range in ranges.iter() {
-    //     for val in range.start..=range.end {
-    //         all_vals.insert(val);
-    //     }
-    //     println!("{}, {}", range.start, range.end);
-    // }
-
     let mut new_ranges = ranges.clone();
-    let mut first = true;
-    while first || new_ranges != ranges {
-        first = false;
+    while {
         ranges = new_ranges.clone();
         new_ranges = Vec::new();
         let mut skip_indices = Vec::new();
@@ -102,12 +82,11 @@ pub fn part2(input: &str) -> String {
             }
             new_ranges.push(*range);
         }
-    }
-    // for range in new_ranges.iter() {
-    // println!("{}-{}", range.start, range.end);
-    // }
+        new_ranges != ranges
+    } {}
+
     new_ranges
-        .iter()
+        .into_iter()
         .fold(0, |acc, range| acc + range.end - range.start + 1)
         .to_string()
         .to_owned()
