@@ -3,7 +3,7 @@
 My personal solutions of the [Advent of Code 2025](https://adventofcode.com/2025) challenge
 
 [![Language](https://img.shields.io/badge/Language-Rust-orange)](https://www.rust-lang.org/)
-[![Days completed](https://img.shields.io/badge/Days%20completed-6-red)](https://github.com/TrojanerHD/AdventofCode2025)
+[![Days completed](https://img.shields.io/badge/Days%20completed-7-red)](https://github.com/TrojanerHD/AdventofCode2025)
 
 ## Check out solutions from others
 **This table will scroll through the years as you click through my repositories**; *if you click on year X, the repositories of X-1, X, and X + 1 (if available) will be shown*.
