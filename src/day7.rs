@@ -30,21 +30,17 @@ pub fn part2(input: &str) -> String {
         for (x, char) in line.chars().enumerate() {
             if char == 'S' {
                 beacons.insert(x, 1);
-            } else if char == '^' {
-                let remove_beacons = beacons.remove(&x);
+            } else if char == '^' && let Some(amount) = beacons.remove(&x) {
+                beacons
+                    .entry(x - 1)
+                    .and_modify(|before| *before += amount)
+                    .or_insert(amount);
 
-                if let Some(amount) = remove_beacons {
-                    beacons
-                        .entry(x - 1)
-                        .and_modify(|before| *before += amount)
-                        .or_insert(amount);
-
-                    beacons
-                        .entry(x + 1)
-                        .and_modify(|after| *after += amount)
-                        .or_insert(amount);
+                beacons
+                    .entry(x + 1)
+                    .and_modify(|after| *after += amount)
+                    .or_insert(amount);
                 }
-            }
         }
     }
 
