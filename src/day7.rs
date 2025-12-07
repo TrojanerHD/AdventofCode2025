@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 pub fn part1(input: &str) -> String {
     let mut beacons = HashSet::new();
@@ -25,24 +25,18 @@ pub fn part1(input: &str) -> String {
 }
 
 pub fn part2(input: &str) -> String {
-    let mut beacons = HashMap::new();
+    let mut beacons = vec![0_u64; input.lines().next().unwrap().len()];
     for line in input.lines() {
         for (x, char) in line.chars().enumerate() {
             if char == 'S' {
                 beacons.insert(x, 1);
-            } else if char == '^' && let Some(amount) = beacons.remove(&x) {
-                beacons
-                    .entry(x - 1)
-                    .and_modify(|before| *before += amount)
-                    .or_insert(amount);
-
-                beacons
-                    .entry(x + 1)
-                    .and_modify(|after| *after += amount)
-                    .or_insert(amount);
-                }
+            } else if char == '^' && beacons[x] != 0 {
+                beacons[x - 1] += beacons[x];
+                beacons[x + 1] += beacons[x];
+                beacons[x] = 0;
+            }
         }
     }
 
-    beacons.values().sum::<u64>().to_string().to_owned()
+    beacons.into_iter().sum::<u64>().to_string().to_owned()
 }
