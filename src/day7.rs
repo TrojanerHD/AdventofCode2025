@@ -48,5 +48,5 @@ pub fn part2(input: &str) -> String {
         }
     }
 
-    beacons.values().sum::<usize>().to_string().to_owned()
+    beacons.values().sum::<u64>().to_string().to_owned()
 }
