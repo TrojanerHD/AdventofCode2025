@@ -5,7 +5,7 @@ use std::{
     time::Instant,
 };
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 
 include!(concat!(env!("OUT_DIR"), "/runner.rs"));
 
@@ -20,10 +20,15 @@ fn main() -> Result<()> {
         day
     };
 
-    if !(1..=25).contains(&day) {
+    if !(1..=12).contains(&day) {
         bail!("day {day} is not a valid advent of code day");
     }
+    let start = Instant::now();
     let input = setup(day)?;
+    println!("Read input file: {:?}", start.elapsed());
+
+    println!();
+
     println!("Running day {day} part 1:");
     let start = Instant::now();
     let result = runner::run_part1(day, &input);
