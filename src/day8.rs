@@ -1,11 +1,14 @@
-use core::fmt;
-
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 struct Point {
     x: i64,
     y: i64,
     z: i64,
-    connected: Vec<Point>,
+}
+
+#[derive(Clone)]
+struct PointConnected {
+    point: Point,
+    connected: Vec<PointConnected>,
 }
 
 impl Point {
@@ -15,19 +18,9 @@ impl Point {
     }
 }
 
-impl PartialEq for Point {
+impl PartialEq for PointConnected {
     fn eq(&self, other: &Self) -> bool {
-        self.x == other.x && self.y == other.y && self.z == other.z
-    }
-}
-
-impl fmt::Debug for Point {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Point")
-            .field("x", &self.x)
-            .field("y", &self.y)
-            .field("z", &self.z)
-            .finish()
+        self.point == other.point
     }
 }
 
@@ -41,14 +34,16 @@ struct Dist {
 }
 
 pub fn part1(input: &str) -> String {
-    let mut circuits: Vec<Vec<Point>> = vec![Vec::new(); input.lines().count()];
+    let mut circuits: Vec<Vec<PointConnected>> = vec![Vec::new(); input.lines().count()];
 
     for (i, line) in input.lines().enumerate() {
         let mut split = line.split(',');
-        let point = Point {
-            x: split.next().unwrap().parse().unwrap(),
-            y: split.next().unwrap().parse().unwrap(),
-            z: split.next().unwrap().parse().unwrap(),
+        let point = PointConnected {
+            point: Point {
+                x: split.next().unwrap().parse().unwrap(),
+                y: split.next().unwrap().parse().unwrap(),
+                z: split.next().unwrap().parse().unwrap(),
+            },
             connected: Vec::new(),
         };
         circuits[i].push(point);
@@ -69,7 +64,7 @@ pub fn part1(input: &str) -> String {
                             continue;
                         }
 
-                        let euclid = point.clone().euclid(point2.clone());
+                        let euclid = point.clone().point.euclid(point2.clone().point);
                         let dist = Dist {
                             dist: euclid,
                             circuit_index: j,
@@ -129,7 +124,6 @@ pub fn part2(input: &str) -> String {
             x: split.next().unwrap().parse().unwrap(),
             y: split.next().unwrap().parse().unwrap(),
             z: split.next().unwrap().parse().unwrap(),
-            connected: Vec::new(),
         };
         circuits[i].push(point);
     }
