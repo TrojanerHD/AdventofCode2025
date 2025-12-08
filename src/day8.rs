@@ -31,7 +31,7 @@ impl fmt::Debug for Point {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, PartialOrd)]
 struct Dist {
     dist: f32,
     circuit_index: usize,
@@ -51,13 +51,12 @@ pub fn part1(input: &str) -> String {
             z: split.next().unwrap().parse().unwrap(),
             connected: Vec::new(),
         };
-        circuits[i].push(point.clone());
+        circuits[i].push(point);
     }
 
     let max = if circuits.len() >= 100 { 1000 } else { 10 }; // For test input
 
     for _ in 0..max {
-        // println!("{i}");
         let mut min: Option<Dist> = None;
         for (j, circuit) in circuits.iter().enumerate() {
             for (point_index, point) in circuit.iter().enumerate() {
@@ -66,33 +65,27 @@ pub fn part1(input: &str) -> String {
                         continue;
                     }
                     for (point2_index, point2) in circuit2.iter().enumerate() {
-                        if point2.connected.contains(point) || point.connected.contains(point2) {
+                        if point2.connected.contains(point)
+                            || point.connected.contains(point2)
+                            || (j == k && point_index == point2_index)
+                        {
                             continue;
                         }
 
-                        if j == k && point_index == point2_index {
-                            continue;
-                        }
-
-                        let dist = point.clone().euclid(point2.clone());
+                        let euclid = point.clone().euclid(point2.clone());
+                        let dist = Dist {
+                            dist: euclid,
+                            circuit_index: j,
+                            circuit2_index: k,
+                            point_index,
+                            point2_index,
+                        };
                         if let Some(act_min) = min {
-                            if act_min.dist > dist {
-                                min = Some(Dist {
-                                    dist,
-                                    circuit_index: j,
-                                    circuit2_index: k,
-                                    point_index,
-                                    point2_index,
-                                });
+                            if act_min > dist {
+                                min = Some(dist);
                             }
                         } else {
-                            min = Some(Dist {
-                                dist,
-                                circuit_index: j,
-                                circuit2_index: k,
-                                point_index,
-                                point2_index,
-                            });
+                            min = Some(dist);
                         }
                     }
                 }
@@ -100,10 +93,6 @@ pub fn part1(input: &str) -> String {
         }
         let min = min.unwrap();
         let mut new_point2 = circuits[min.circuit2_index][min.point2_index].clone();
-        // println!(
-        // "comparing {:?} with {:?}",
-        // circuits[min.circuit_index][min.point_index], new_point2
-        // );
         circuits[min.circuit_index][min.point_index]
             .connected
             .push(new_point2.clone());
@@ -111,25 +100,23 @@ pub fn part1(input: &str) -> String {
             .connected
             .push(circuits[min.circuit_index][min.point_index].clone());
         if min.circuit_index != min.circuit2_index {
-            for point2 in circuits.remove(min.circuit2_index) {
-                circuits[min.circuit_index].push(point2.clone());
-            }
-        } else {
-            // println!();
-            // println!("skip");
+            let to_add = circuits.swap_remove(min.circuit2_index);
+            circuits[min.circuit_index].extend(to_add);
         }
-        // println!();
-        // println!("{i}: {:?}", circuits);
     }
 
-    circuits.sort_unstable_by_key(|points2| std::cmp::Reverse(points2.len()));
-    // println!();
-    // println!("result: {:?}", circuits);
-
-    circuits
+    let mut circuit_lengths = circuits
         .iter()
+        .map(|circuit| circuit.len())
+        .collect::<Vec<_>>();
+
+    circuit_lengths.sort_unstable();
+
+    circuit_lengths
+        .iter()
+        .rev()
         .take(3)
-        .map(|points| points.len() as u64)
+        .copied()
         .reduce(|acc, length| acc * length)
         .unwrap()
         .to_string()
@@ -147,10 +134,10 @@ pub fn part2(input: &str) -> String {
             z: split.next().unwrap().parse().unwrap(),
             connected: Vec::new(),
         };
-        circuits[i].push(point.clone());
+        circuits[i].push(point);
     }
 
-    let mut last = (None, None);
+    let mut last = 0;
 
     while circuits.len() != 1 {
         let mut min: Option<Dist> = None;
@@ -161,61 +148,32 @@ pub fn part2(input: &str) -> String {
                         continue;
                     }
                     for (point2_index, point2) in circuit2.iter().enumerate() {
-                        let dist = point.clone().euclid(point2.clone());
+                        let euclid = point.clone().euclid(point2.clone());
+                        let dist = Dist {
+                            dist: euclid,
+                            circuit_index: j,
+                            circuit2_index: k,
+                            point_index,
+                            point2_index,
+                        };
                         if let Some(act_min) = min {
-                            if act_min.dist > dist {
-                                min = Some(Dist {
-                                    dist,
-                                    circuit_index: j,
-                                    circuit2_index: k,
-                                    point_index,
-                                    point2_index,
-                                });
+                            if act_min > dist {
+                                min = Some(dist);
                             }
                         } else {
-                            min = Some(Dist {
-                                dist,
-                                circuit_index: j,
-                                circuit2_index: k,
-                                point_index,
-                                point2_index,
-                            });
+                            min = Some(dist);
                         }
                     }
                 }
             }
         }
+
         let min = min.unwrap();
-        let mut new_point2 = circuits[min.circuit2_index][min.point2_index].clone();
-        last = (
-            Some(circuits[min.circuit_index][min.point_index].x),
-            Some(new_point2.x),
-        );
-        // println!(
-        // "comparing {:?} with {:?}",
-        // circuits[min.circuit_index][min.point_index], new_point2
-        // );
-        circuits[min.circuit_index][min.point_index]
-            .connected
-            .push(new_point2.clone());
-        new_point2
-            .connected
-            .push(circuits[min.circuit_index][min.point_index].clone());
-        if min.circuit_index != min.circuit2_index {
-            for point2 in circuits.remove(min.circuit2_index) {
-                circuits[min.circuit_index].push(point2.clone());
-            }
-        } else {
-            // println!();
-            // println!("skip");
-        }
-        // println!();
-        // println!("{i}: {:?}", circuits);
+        last = circuits[min.circuit_index][min.point_index].x
+            * circuits[min.circuit2_index][min.point2_index].x;
+        let to_add = circuits.swap_remove(min.circuit2_index);
+        circuits[min.circuit_index].extend(to_add);
     }
 
-    circuits.sort_unstable_by_key(|points2| std::cmp::Reverse(points2.len()));
-    // println!();
-    // println!("result: {:?}", circuits);
-
-    (last.0.unwrap() * last.1.unwrap()).to_string().to_owned()
+    last.to_string().to_owned()
 }
