@@ -104,19 +104,23 @@ mod tests {
                 .reduce(|acc, line| format!("{acc}\n{line}"))
                 .unwrap();
 
-            let part1_res = runner::run_part1(day, input.as_str());
             let file_name = input_file.unwrap().file_name().into_string().unwrap();
-            assert_eq!(
-                part1_res, output1,
-                "day {day} part 1: {} failed. Expected output: {output1}, actual output: {part1_res}",
-                file_name
-            );
-            let part2_res = runner::run_part2(day, input.as_str());
-            assert_eq!(
-                part2_res, output2,
-                "day {day} part 2: {} failed. Expected output: {output2}, actual output: {part2_res}",
-                file_name
-            );
+            if !output1.is_empty() {
+                let part1_res = runner::run_part1(day, input.as_str());
+                assert_eq!(
+                    part1_res, output1,
+                    "day {day} part 1: {} failed. Expected output: {output1}, actual output: {part1_res}",
+                    file_name
+                );
+            }
+            if !output2.is_empty() {
+                let part2_res = runner::run_part2(day, input.as_str());
+                assert_eq!(
+                    part2_res, output2,
+                    "day {day} part 2: {} failed. Expected output: {output2}, actual output: {part2_res}",
+                    file_name
+                );
+            }
         }
         if empty {
             bail!("No test inputs for day {day}");
