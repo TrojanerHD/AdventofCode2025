@@ -59,11 +59,8 @@ pub fn part1(input: &str) -> String {
     for _ in 0..max {
         let mut min: Option<Dist> = None;
         for (j, circuit) in circuits.iter().enumerate() {
-            for (point_index, point) in circuit.iter().enumerate() {
-                for (k, circuit2) in circuits.iter().enumerate() {
-                    if j > k {
-                        continue;
-                    }
+            for (k, circuit2) in circuits.iter().enumerate().skip(j) {
+                for (point_index, point) in circuit.iter().enumerate() {
                     for (point2_index, point2) in circuit2.iter().enumerate() {
                         if point2.connected.contains(point)
                             || point.connected.contains(point2)
@@ -142,11 +139,8 @@ pub fn part2(input: &str) -> String {
     while circuits.len() != 1 {
         let mut min: Option<Dist> = None;
         for (j, circuit) in circuits.iter().enumerate() {
-            for (point_index, point) in circuit.iter().enumerate() {
-                for (k, circuit2) in circuits.iter().enumerate() {
-                    if j >= k {
-                        continue;
-                    }
+            for (k, circuit2) in circuits.iter().enumerate().skip(j + 1) {
+                for (point_index, point) in circuit.iter().enumerate() {
                     for (point2_index, point2) in circuit2.iter().enumerate() {
                         let euclid = point.clone().euclid(point2.clone());
                         let dist = Dist {
