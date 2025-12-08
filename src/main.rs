@@ -93,7 +93,6 @@ mod tests {
             file_name.starts_with(format!("test{day}.").as_str())
                 || file_name.starts_with(format!("test{day}_").as_str())
         }) {
-            empty = false;
             let file_content = fs::read_to_string(input_file.as_ref().unwrap().path())?;
             let mut lines_back = file_content.lines().rev();
             let output2 = lines_back.next().unwrap();
@@ -106,6 +105,7 @@ mod tests {
 
             let file_name = input_file.unwrap().file_name().into_string().unwrap();
             if !output1.is_empty() {
+                empty = false;
                 let part1_res = runner::run_part1(day, input.as_str());
                 assert_eq!(
                     part1_res, output1,
@@ -114,6 +114,7 @@ mod tests {
                 );
             }
             if !output2.is_empty() {
+                empty = false;
                 let part2_res = runner::run_part2(day, input.as_str());
                 assert_eq!(
                     part2_res, output2,
@@ -123,7 +124,7 @@ mod tests {
             }
         }
         if empty {
-            bail!("No test inputs for day {day}");
+            bail!("No test inputs for day {day} or no expected output");
         } else {
             println!("Day {day} tested");
         }
