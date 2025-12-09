@@ -24,43 +24,42 @@ fn wrapping(index: usize, sub: bool, len: usize) -> usize {
 }
 
 pub fn part1(input: &str) -> String {
-    let mut points = Vec::new();
-    for line in input.lines() {
-        let (x, y) = line.split_once(',').unwrap();
-        points.push(Point {
-            x: x.parse().unwrap(),
-            y: y.parse().unwrap(),
-        });
-    }
+    let points = input
+        .lines()
+        .map(|line| {
+            let (x, y) = line.split_once(',').unwrap();
+            Point {
+                x: x.parse().unwrap(),
+                y: y.parse().unwrap(),
+            }
+        })
+        .collect::<Vec<_>>();
 
     let mut max = 0;
-    for point1 in points.iter() {
-        for point2 in points.iter() {
-            if point2 <= point1 {
-                continue;
-            }
+    let mut other_points = Vec::new();
+    for point1 in points {
+        for point2 in other_points.iter() {
             let sub = point1.abs_diff(point2);
             let area = (sub.x + 1) * (sub.y + 1);
             max = max.max(area);
         }
+        other_points.push(point1);
     }
 
     max.to_string().to_owned()
 }
 
 pub fn part2(input: &str) -> String {
-    let mut points = Vec::new();
-    let mut y_max = 0_usize;
-    let mut x_max = 0_usize;
-    for line in input.lines() {
-        let (x, y) = line.split_once(',').unwrap();
-        points.push(Point {
-            x: x.parse().unwrap(),
-            y: y.parse().unwrap(),
-        });
-        x_max = x_max.max(x.parse().unwrap());
-        y_max = y_max.max(y.parse().unwrap());
-    }
+    let mut y_max = 0;
+    let points = input
+        .lines()
+        .map(|line| {
+            let (x, y) = line.split_once(',').unwrap();
+            let (x, y) = (x.parse().unwrap(), y.parse().unwrap());
+            y_max = y_max.max(y);
+            Point { x, y }
+        })
+        .collect::<Vec<_>>();
 
     let mut min_x: Option<(usize, Point)> = None;
     let mut max_x: Option<(usize, Point)> = None;
@@ -143,11 +142,9 @@ pub fn part2(input: &str) -> String {
     }
 
     let mut max = 0;
-    for point1 in points.iter() {
-        'innerPoint: for point2 in points.iter() {
-            if point2 <= point1 {
-                continue;
-            }
+    let mut other_points = Vec::new();
+    for point1 in points {
+        'innerPoint: for point2 in other_points.iter() {
             let sub = point1.abs_diff(point2);
             let area = (sub.x + 1) * (sub.y + 1);
             let min_x = point1.x.min(point2.x);
@@ -161,6 +158,7 @@ pub fn part2(input: &str) -> String {
             }
             max = max.max(area);
         }
+        other_points.push(point1);
     }
 
     max.to_string().to_owned()
