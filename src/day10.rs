@@ -1,4 +1,4 @@
-use std::time::Instant;
+use std::{sync::mpsc, time::Instant};
 
 fn find_shortest_pattern(goal: Vec<bool>, buttons: Vec<Vec<u16>>) -> u16 {
     if !goal.contains(&true) {
@@ -189,8 +189,7 @@ pub fn part1(input: &str) -> String {
 }
 
 pub fn part2(input: &str) -> String {
-    let start = Instant::now();
-    let mut res = 0;
+    let (tx, rx) = mpsc::channel();
     for (i, line) in input.lines().enumerate() {
         let start1 = Instant::now();
         let mut all_inputs = line.split_whitespace();
@@ -215,19 +214,54 @@ pub fn part2(input: &str) -> String {
             })
             .collect::<Vec<_>>();
         buttons.sort_unstable_by_key(|button| std::cmp::Reverse(button.len()));
-        let val = recursive2(&joltage, &buttons).unwrap();
-        res += val;
-        println!(
-            "Solved {} / {} with {val}. Took: {:?}",
-            i + 1,
-            input.lines().count(),
-            start1.elapsed()
-        );
+        let tx1 = tx.clone();
+        std::thread::spawn(move || {
+            let val = recursive2(&joltage, &buttons).unwrap();
+            println!("Solved {} with {val}. Took: {:?}", i + 1, start1.elapsed());
+            tx1.send(val).unwrap();
+        });
     }
 
-    println!("Took {:?}", start.elapsed());
+    input
+        .lines()
+        .map(|_| rx.recv().unwrap())
+        .sum::<u16>()
+        .to_string()
+        .to_owned()
+}
 
-    res.to_string().to_owned()
+#[cfg(test)]
+mod tests {
+    use crate::day10::combinations;
+
+    #[test]
+    fn test_combinations() {
+        assert_eq!(
+            combinations(4, 3).collect::<Vec<_>>(),
+            vec![
+                vec![3, 0, 0, 0],
+                vec![2, 1, 0, 0],
+                vec![1, 2, 0, 0],
+                vec![0, 3, 0, 0],
+                vec![2, 0, 1, 0],
+                vec![1, 1, 1, 0],
+                vec![0, 2, 1, 0],
+                vec![1, 0, 2, 0],
+                vec![0, 1, 2, 0],
+                vec![0, 0, 3, 0],
+                vec![2, 0, 0, 1],
+                vec![1, 1, 0, 1],
+                vec![0, 2, 0, 1],
+                vec![1, 0, 1, 1],
+                vec![0, 1, 1, 1],
+                vec![0, 0, 2, 1],
+                vec![1, 0, 0, 2],
+                vec![0, 1, 0, 2],
+                vec![0, 0, 1, 2],
+                vec![0, 0, 0, 3]
+            ]
+        );
+    }
 }
 
 #[cfg(test)]
