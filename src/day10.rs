@@ -44,62 +44,55 @@ fn combinations(length: usize, total: u16) -> impl Iterator<Item = Vec<u16>> {
             done = true;
             return Some(combination.clone());
         }
-        loop {
-            if combination[length - 1] == total {
-                done = true;
-            }
-            let prev = combination.clone();
-            let res = prev.iter().sum();
-            let mut change = false;
-            if combination[0] == 0 {
-                if length >= 2 {
-                    if combination[1] == 0 {
-                        change = true;
-                        *combination.iter_mut().find(|val| **val != 0).unwrap() = total + 1;
-                    } else {
-                        combination.swap(0, 1);
-                    }
-                    if combination[0] > total {
-                        return None;
-                    }
+        if combination[length - 1] == total {
+            done = true;
+        }
+        let prev = combination.clone();
+        let mut change = false;
+        if combination[0] == 0 {
+            if length >= 2 {
+                if combination[1] == 0 {
+                    change = true;
+                    *combination.iter_mut().find(|val| **val != 0).unwrap() = total + 1;
                 } else {
-                    done = true;
-                }
-                if length >= 3 && !change {
-                    combination[2] += 1;
+                    combination.swap(0, 1);
                 }
             } else {
-                combination[1] += 1;
+                done = true;
             }
-            for i in 1..length {
-                if combination[i] > total {
-                    if i == length - 1 {
-                        done = true;
-                        break;
-                    }
-                    change = true;
-                    combination[i + 1] += 1;
-                    combination[i] = 0;
-                    combination[0] = total - combination.iter().sum::<u16>();
+            if length >= 3 && !change {
+                combination[2] += 1;
+            }
+        } else {
+            combination[1] += 1;
+        }
+        for i in 1..length {
+            if combination[i] > total {
+                if i == length - 1 {
+                    done = true;
                     break;
                 }
-            }
-            if !change {
-                combination[0] -= 1;
-            }
-            if total == res {
-                if length == 1 {
-                    done = true;
-                }
-                return Some(prev);
+                change = true;
+                combination[i + 1] += 1;
+                combination[i] = 0;
+                combination[0] = total - combination.iter().sum::<u16>();
+                break;
             }
         }
+        if !change {
+            combination[0] -= 1;
+        }
+        Some(prev)
     })
 }
 
 fn recursive2(pattern: &[u16], buttons: &[Vec<u16>]) -> Option<u16> {
     if pattern.iter().all(|val| *val == 0) {
         return Some(0);
+    }
+
+    if buttons.is_empty() {
+        return None;
     }
 
     let no_zeroes = pattern
@@ -118,7 +111,7 @@ fn recursive2(pattern: &[u16], buttons: &[Vec<u16>]) -> Option<u16> {
         })
         .collect::<Vec<_>>();
 
-    if buttons.is_empty() || no_zeroes.iter().any(|(_, _, count)| *count == 0) {
+    if no_zeroes.iter().any(|(_, _, count)| *count == 0) {
         return None;
     }
 
