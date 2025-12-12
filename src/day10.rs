@@ -40,29 +40,14 @@ fn combinations(length: usize, total: u16) -> impl Iterator<Item = Vec<u16>> {
         if done {
             return None;
         }
-        if length == 1 {
+        if length == 1 || combination[length - 1] == total {
             done = true;
             return Some(combination.clone());
-        }
-        if combination[length - 1] == total {
-            done = true;
         }
         let prev = combination.clone();
         let mut change = false;
         if combination[0] == 0 {
-            if length >= 2 {
-                if combination[1] == 0 {
-                    change = true;
-                    *combination.iter_mut().find(|val| **val != 0).unwrap() = total + 1;
-                } else {
-                    combination.swap(0, 1);
-                }
-            } else {
-                done = true;
-            }
-            if length >= 3 && !change {
-                combination[2] += 1;
-            }
+            *combination.iter_mut().find(|val| **val != 0).unwrap() = total + 1;
         } else {
             combination[1] += 1;
         }
@@ -79,8 +64,8 @@ fn combinations(length: usize, total: u16) -> impl Iterator<Item = Vec<u16>> {
                 break;
             }
         }
-        if !change {
-            combination[0] -= 1;
+        if !change && let Some(res) = combination[0].checked_sub(1) {
+            combination[0] = res;
         }
         Some(prev)
     })
@@ -243,4 +228,38 @@ pub fn part2(input: &str) -> String {
     println!("Took {:?}", start.elapsed());
 
     res.to_string().to_owned()
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::day10::combinations;
+
+    #[test]
+    fn test_combinations() {
+        assert_eq!(
+            combinations(4, 3).collect::<Vec<_>>(),
+            vec![
+                vec![3, 0, 0, 0],
+                vec![2, 1, 0, 0],
+                vec![1, 2, 0, 0],
+                vec![0, 3, 0, 0],
+                vec![2, 0, 1, 0],
+                vec![1, 1, 1, 0],
+                vec![0, 2, 1, 0],
+                vec![1, 0, 2, 0],
+                vec![0, 1, 2, 0],
+                vec![0, 0, 3, 0],
+                vec![2, 0, 0, 1],
+                vec![1, 1, 0, 1],
+                vec![0, 2, 0, 1],
+                vec![1, 0, 1, 1],
+                vec![0, 1, 1, 1],
+                vec![0, 0, 2, 1],
+                vec![1, 0, 0, 2],
+                vec![0, 1, 0, 2],
+                vec![0, 0, 1, 2],
+                vec![0, 0, 0, 3]
+            ]
+        );
+    }
 }
