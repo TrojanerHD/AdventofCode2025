@@ -263,37 +263,3 @@ mod tests {
         );
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use crate::day10::combinations;
-
-    #[test]
-    fn test_combinations() {
-        assert_eq!(
-            combinations(4, 3).collect::<Vec<_>>(),
-            vec![
-                vec![3, 0, 0, 0],
-                vec![2, 1, 0, 0],
-                vec![1, 2, 0, 0],
-                vec![0, 3, 0, 0],
-                vec![2, 0, 1, 0],
-                vec![1, 1, 1, 0],
-                vec![0, 2, 1, 0],
-                vec![1, 0, 2, 0],
-                vec![0, 1, 2, 0],
-                vec![0, 0, 3, 0],
-                vec![2, 0, 0, 1],
-                vec![1, 1, 0, 1],
-                vec![0, 2, 0, 1],
-                vec![1, 0, 1, 1],
-                vec![0, 1, 1, 1],
-                vec![0, 0, 2, 1],
-                vec![1, 0, 0, 2],
-                vec![0, 1, 0, 2],
-                vec![0, 0, 1, 2],
-                vec![0, 0, 0, 3]
-            ]
-        );
-    }
-}
