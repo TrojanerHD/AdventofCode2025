@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 struct Point {
     x: usize,
@@ -15,7 +17,7 @@ impl Point {
 
 fn wrapping(index: usize, sub: bool, len: usize) -> usize {
     if !sub {
-        if index + 1 < len - 1 { index + 1 } else { 0 }
+        (index + 1) % len
     } else if let Some(sub) = index.checked_sub(1) {
         sub
     } else {
@@ -68,9 +70,38 @@ impl Point2 {
     fn y(&self) -> usize {
         self.point.y
     }
-    fn abs_diff(&self, other: &Point2) -> Point {
-        self.point.abs_diff(&other.point)
+}
+
+fn calc_bounds(
+    points: &[Point2],
+    hash_points: &HashMap<usize, Vec<(usize, Option<usize>)>>,
+    y: usize,
+) -> Vec<(usize, usize)> {
+    let mut new_bounds = Vec::new();
+    let mut min = None;
+    let mut take = false;
+    let y_points = hash_points.get(&y).unwrap();
+    for (j, point) in y_points.iter().enumerate() {
+        let prev_take = take;
+        if let Some(i) = point.1 {
+            let next_point = &points[wrapping(i, false, points.len())];
+            let next_y_point = y_points.get(j + 1);
+            take = if !take {
+                true
+            } else {
+                next_point.y() == y || next_y_point.is_some_and(|point2| point2.1.is_none())
+            };
+        } else {
+            take = !take;
+        }
+        if !prev_take && take {
+            min = Some(point.0);
+        } else if prev_take && !take {
+            new_bounds.push((min.unwrap(), point.0));
+            min = None;
+        }
     }
+    new_bounds
 }
 
 pub fn part2(input: &str) -> String {
@@ -78,7 +109,8 @@ pub fn part2(input: &str) -> String {
     let mut x_min = usize::MAX;
     let mut y_max = 0;
     let mut x_max = 0;
-    let mut points = input
+    let mut hash_points: HashMap<usize, Vec<(usize, Option<usize>)>> = HashMap::new();
+    let points = input
         .lines()
         .enumerate()
         .map(|(i, line)| {
@@ -88,13 +120,13 @@ pub fn part2(input: &str) -> String {
             x_max = x_max.max(x);
             y_min = y_min.min(y);
             x_min = x_min.min(x);
+            hash_points
+                .entry(y)
+                .and_modify(|vec| vec.push((x, Some(i))))
+                .or_insert(vec![(x, Some(i))]);
             Point2::new(x, y, Some(i))
         })
         .collect::<Vec<_>>();
-
-    let original_points = points.clone();
-
-    let mut new_points = Vec::new();
 
     for (i, point) in points.iter().enumerate() {
         for j in [
@@ -107,73 +139,47 @@ pub fn part2(input: &str) -> String {
             }
             if point.x() == point2.x() {
                 for y in (point.y().min(point2.y()) + 1)..point.y().max(point2.y()) {
-                    new_points.push(Point2::new(point.x(), y, None));
+                    hash_points
+                        .entry(y)
+                        .and_modify(|vec| vec.push((point.x(), None)))
+                        .or_insert(vec![(point.x(), None)]);
                 }
             }
         }
     }
-    points.extend(new_points);
 
-    let mut greens = vec![Vec::new(); y_max + 1];
+    let mut greens = vec![None; y_max + 1];
 
-    points.sort_unstable_by(|point, point2| {
-        match point.y().cmp(&point2.y()) {
-            std::cmp::Ordering::Equal => {}
-            a => return a,
-        }
-        point.x().cmp(&point2.x())
-    });
-    let mut min = None;
-    let mut take = false;
-    let mut prev_y = 0;
-    for (j, point) in points.iter().enumerate() {
-        if prev_y != point.y() {
-            min = None;
-            take = false;
-        }
-        prev_y = point.y();
-        let prev_take = take;
-        if let Some(i) = point.index {
-            let next_point = &points[wrapping(i, false, points.len())];
-            let next_y_point = points.get(j + 1);
-            if !take {
-                take = true;
-            } else {
-                take = next_point.y() == point.y()
-                    || next_y_point
-                        .is_some_and(|point2| point2.index.is_none() && point2.y() == point.y());
-            }
-        } else {
-            take = !take;
-        }
-        if !prev_take && take {
-            min = Some(point.x());
-        } else if prev_take && !take {
-            greens[point.y()].push((min.unwrap(), point.x()));
-            min = None;
-        }
+    for y_points in hash_points.values_mut() {
+        y_points.sort_unstable_by_key(|point| point.0);
     }
-
     let mut max = 0;
-    for point1 in original_points.iter() {
-        'innerPoint: for point2 in original_points.iter() {
-            if point1 <= point2 {
-                continue;
-            }
-            let sub = point1.abs_diff(point2);
-            let area = (sub.x + 1) * (sub.y + 1);
+    for (i, point1) in points.iter().enumerate() {
+        'innerPoint: for point2 in points.iter().take(i - 1) {
             let min_x = point1.x().min(point2.x());
             let max_x = point1.x().max(point2.x());
             let min_y = point1.y().min(point2.y());
             let max_y = point1.y().max(point2.y());
-            for bounds in greens.iter().take(max_y + 1).skip(min_y) {
-                for (min, max) in bounds {
-                    if *min > min_x || *max < max_x {
-                        continue 'innerPoint;
-                    }
+
+            let area = (max_x - min_x + 1) * (max_y - min_y + 1);
+            if area <= max {
+                continue;
+            }
+            for (y, bounds) in greens.iter_mut().enumerate().take(max_y + 1).skip(min_y) {
+                if bounds.is_none() {
+                    *bounds = Some(calc_bounds(&points, &hash_points, y));
+                }
+                if !bounds
+                    .as_ref()
+                    .unwrap()
+                    .iter()
+                    .any(|(min, max)| *min <= min_x && *max >= max_x)
+                {
+                    continue 'innerPoint;
                 }
             }
-            max = max.max(area);
+
+            max = area;
         }
     }
 
