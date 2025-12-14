@@ -4,7 +4,7 @@ fn find_shortest_pattern(goal: Vec<bool>, buttons: Vec<Vec<u16>>) -> u16 {
     if !goal.contains(&true) {
         return 0;
     }
-    let mut possible_combinations = Vec::new();
+    let mut min = None;
     let mut patterns = vec![(vec![false; goal.len()], 0)];
     loop {
         let mut new_patterns = patterns.clone();
@@ -19,14 +19,14 @@ fn find_shortest_pattern(goal: Vec<bool>, buttons: Vec<Vec<u16>>) -> u16 {
                 } else {
                     new_patterns.push((changed_pattern.clone(), button_presses + 1));
                 }
-                if changed_pattern == goal {
-                    possible_combinations.push(button_presses + 1);
+                if changed_pattern == goal && min.is_none_or(|min| min > button_presses + 1) {
+                    min = Some(button_presses + 1);
                 }
             }
         }
 
         if new_patterns.len() == patterns.len() {
-            return *possible_combinations.iter().min().unwrap();
+            return min.unwrap();
         }
         patterns = new_patterns;
     }
