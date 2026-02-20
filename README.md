@@ -26,26 +26,25 @@ My personal solutions of the [Advent of Code 2025](https://adventofcode.com/2025
     </tr>
     <tr>
       <td>Schlauer-Hax</td>
-      <td colspan=2 align="center"><a href="https://github.com/Schlauer-Hax/advent-of-code">advent-of-code</a></td>
-      <td></td>
+      <td colspan=3 align="center"><a href="https://github.com/Schlauer-Hax/advent-of-code">advent-of-code</a></td>
     </tr>
     <tr>
       <td>derNiklaas</td>
       <td><a href="https://github.com/derNiklaas/Advent-of-Code-2023">Advent-of-Code-2023</a></td>
-      <td><a href="https://github.com/derNiklaas/Advent-Of-Code-2024">Advent-Of-Code-2024</a></td>
+      <td><a href="https://github.com/derNiklaas/Advent-of-Code-2024">Advent-of-Code-2024</a></td>
       <td><a href="https://github.com/derNiklaas/Advent-of-Code-2025">Advent-of-Code-2025</a></td>
     </tr>
     <tr>
       <td>LeMoonStar</td>
       <td><a href="https://github.com/LeMoonStar/AoC23">AoC23</a></td>
       <td><a href="https://github.com/LeMoonStar/AoC24">AoC24</a></td>
-      <td></td>
+      <td><a href="https://git.unitcore.de/LeMoonStar/AoC25">AoC25</a></td>
     </tr>
     <tr>
       <td>daanbreur</td>
       <td><a href="https://github.com/daanbreur/AdventofCode">AdventofCode</a></td>
       <td></td>
-      <td></td>
+      <td><a href="https://github.com/daanbreur/AdventofCode">AdventofCode</a></td>
     </tr>
     <tr>
       <td>luftkeks</td>
@@ -70,5 +69,12 @@ My personal solutions of the [Advent of Code 2025](https://adventofcode.com/2025
       <td></td>
       <td><a href="https://github.com/MelanX/AdventOfCode">AdventOfCode</a></td>
       <td></td>
+    </tr>
+    <tr>
+      <td>Lypsilonx</td>
+      <td></td>
+      <td></td>
+      <td><a href="https://github.com/Lypsilonx/AdventOfCode">AdventOfCode</a></td>
+    </tr>
   </tbody>
 </table>
